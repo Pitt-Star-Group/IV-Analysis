@@ -416,7 +416,7 @@ for i in range (0,len(sbkg)):
     #print yintercept, slope, vth, yvth, i6, in6, i4, in4, i3, in3, gmin
     #print syintercept, sslope, svth, si6, sin6, si4, sin4, si3, sin3, sgmin
     p1=(sslope-slope)/slope  #dt/t - relative change in transconductance
-    p2=(svth-vth)/vth              #dvth - relative change in threshold voltage      
+    p2=(svth-vth)/abs(vth)              #dvth - relative change in threshold voltage      
     #p3=(sgmin-gmin)/gmin     #dgm/gm
     #p4=(si6-i6)/yvth         #dg/gvth@0.6v    g is yvth
     p5=(sin6-in6)/in6       #dg/gvth@-0.6    g is yvth - relative change in conductance @ -0.6V
@@ -426,7 +426,7 @@ for i in range (0,len(sbkg)):
     p9=(sin3-in3)/in3       #dg/gvth@-0.3     g is yvth - relative change in conductance @ -0.3V
     #p10=(si6-i6)/i6          #dg/g@0.6v
     #p11=(sin6-in6)/in6       #dg/g@-0.6
-    print p1, p2, p5, p7, p9, sbkg[i], ssample[i]
+    print p1,"\t", p2,"\t", p5,"\t", p7,"\t", p9,"\t", sbkg[i],"\t", ssample[i]
     
 'please import you files into C:\, background file should end up with h2o'
 'background file and sample file should share the same name except the last word, h2o or name of the sample'   
