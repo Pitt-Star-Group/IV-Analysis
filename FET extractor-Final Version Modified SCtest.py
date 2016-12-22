@@ -162,17 +162,18 @@ def calculatebkg(filepath):
     slope=min(limitlder)                  
     indexslope=lder.index(slope)
 
-    #Change the values in the abs function to select the current at a desired Vg. 
-    #Example: i3 = y[np.argmin(abs(x-10.0))] selects current at 10 Vg. 
-    
-    i3 = y[np.argmin(abs(x-0.0))]
-    in3= y[np.argmin(abs(x+0.0))]
-    
-    i4= y[np.argmin(abs(x-10.0))]
-    in4= y[np.argmin(abs(x+10.0))]
-    
-    i6= y[np.argmin(abs(x-30.0))]
-    in6= y[np.argmin(abs(x+30.0))]
+    #0.3
+    i3 = y[np.argmin(abs(x-0.3))]
+    #-0.3
+    in3= y[np.argmin(abs(x+0.3))]
+    #0.4
+    i4= y[np.argmin(abs(x-0.4))]
+    #-0.4
+    in4= y[np.argmin(abs(x+0.4))]
+    #0.6
+    i6= y[np.argmin(abs(x-0.6))]
+    #-0.6
+    in6= y[np.argmin(abs(x+0.6))]
 
     #looking down to find the rightmost point of linear region.
     from scipy import stats
@@ -193,7 +194,7 @@ def calculatebkg(filepath):
     xintercept= -intercept/slope
     yintercept=intercept
     
-    xvth= (gmin-yintercept)/slope
+    xvth= (-yintercept)/slope
     vth=xl[np.argmin(abs(x-xvth))]
     #get y value of vth
     yvth=yl[np.argmin(abs(x-xvth))]   
@@ -294,7 +295,7 @@ def calculatesample(filepath):
 
 
 
-    #Define smoothing function
+    #define smoothing function
     def savitzky_golay(y, window_size, order, deriv=0, rate=1):
 
         import numpy as np
@@ -360,16 +361,17 @@ def calculatesample(filepath):
     slope=min(slimitlder)                  
     indexslope=lder.index(slope)
                       
-    #Change the values in the abs function to select the current at a desired Vg. 
-    #Example: i3 = y[np.argmin(abs(x-10.0))] selects current at 10 Vg. 
-    
+    #0.3
     i3 = y[np.argmin(abs(x-0.3))]
+    #-0.3
     in3= y[np.argmin(abs(x+0.3))]
-    
+    #0.4
     i4= y[np.argmin(abs(x-0.4))]
+    #-0.4
     in4= y[np.argmin(abs(x+0.4))]
-    
+    #0.6
     i6= y[np.argmin(abs(x-0.6))]
+    #-0.6
     in6= y[np.argmin(abs(x+0.6))]
 
     #Get the right most of the linear region
@@ -391,51 +393,42 @@ def calculatesample(filepath):
     xintercept= -intercept/slope
     yintercept=intercept
     
-    xvth= (gmin-yintercept)/slope  
+    xvth= (-yintercept)/slope  
     vth=xl[np.argmin(abs(x-xvth))]
     
     return yintercept, slope, vth, i6, in6, i4, in4, i3, in3, gmin/0.05   #all the 10 parameters, this is the function for processing sample
-
-#Start of the analysis code.
 
 import glob, os
 bkg = []
 sample = []
 sbkg=[]
 ssample=[]
-
-#Set the directory to the location of the IVg text files. Use forward slash.
-for file in glob.glob("C:/Users/Sean/Box Sync/Graduate School/Research/Data/Sensor/Source Meter/THC Sensor/2016-12-21 - THC 17-19 Purus Nano - THC and small molecule cross sensitivity test/THC 17 Device A - Sensing IVg Neg*"):
-
-    #Change the phrase in the quotation marks to a word that is in the blank reference IVg text file
-    if 'prepared' in file:
-        
+for file in glob.glob("D:/*.txt"):
+    if 'h2o' in file:
         bkg.append(file)
-    
     else:
-        
         sample.append(file)
-        
 sbkg=sorted(bkg)
 ssample=sorted(sample)
-[yintercept, slope, vth, yvth, i6, in6, i4, in4, i3, in3, gmin] = calculatebkg(sbkg[0])
-
-#Prints the value
-for i in range (0,len(sample)):   
+for i in range (0,len(sbkg)):
+    [yintercept, slope, vth, yvth, i6, in6, i4, in4, i3, in3, gmin] = calculatebkg(sbkg[i])
     [syintercept, sslope, svth, si6, sin6, si4, sin4, si3, sin3, sgmin] = calculatesample(ssample[i])
+    #print yintercept, slope, vth, yvth, i6, in6, i4, in4, i3, in3, gmin
+    #print syintercept, sslope, svth, si6, sin6, si4, sin4, si3, sin3, sgmin
+    p1=(sslope-slope)/slope  #dt/t - relative change in transconductance
+    p2=(svth-vth)/abs(vth)              #dvth - relative change in threshold voltage      
+    #p3=(sgmin-gmin)/gmin     #dgm/gm
+    #p4=(si6-i6)/yvth         #dg/gvth@0.6v    g is yvth
+    p5=(sin6-in6)/in6       #dg/gvth@-0.6    g is yvth - relative change in conductance @ -0.6V
+    #p6=(si4-i4)/yvth         #dg/gvth@0.4     g is yvth
+    p7=(sin4-in4)/in4       #dg/gvth@-0.4     g is yvth - relative change in conductance @ -0.4V
+    #p8=(si3-i3)/yvth         #dg/gvth@0.3     g is yvth
+    p9=(sin3-in3)/in3       #dg/gvth@-0.3     g is yvth - relative change in conductance @ -0.3V
+    #p10=(si6-i6)/i6          #dg/g@0.6v
+    #p11=(sin6-in6)/in6       #dg/g@-0.6
+    print p1,"\t", p2,"\t", p5,"\t", p7,"\t", p9,"\t", sbkg[i],"\t", ssample[i]
     
-    p1=(sslope-slope)/abs(slope)    #Absolute change in transconductance
-    p2=(sslope-slope)               #Relative change in transconductance
-    p3=(svth-vth)                   #Absolute change in Vth      
-    p4=(svth-vth)/abs(vth)          #Normalized change in Vth
-    p5=(si6-i6)/abs(i6)             #Normalized change in current at specified Vg
-    p6=(sin6-in6)/abs(in6)          #Normalized change in current at specified Vg
-    p7=(si4-i4)/abs(i4)             #Normalized change in current at specified Vg
-    p8=(sin4-in4)/abs(in4)          #Normalized change in current at specified Vg
-    p9=(si3-i3)/abs(i3)             #Normalized change in current at specified Vg
-    p10=(sin3-in3)/abs(in3)         #Normalized change in current at specified Vg
-    p11=(si6-i6)/abs(i6)            #Normalized change in current at specified Vg
-    p12=(sin6-in6)/abs(in6)         #Normalized change in current at specified Vg
-    print p1, "\t", p2, "\t", p3, "\t", p4, "\t", p5, "\t", p6, "\t", p7, "\t", p8, "\t", p9, "\t", p10, "\t", p11, "\t", p12, "\t", sbkg[0], "\t", ssample[i]
-    
+'please import you files into C:\, background file should end up with h2o'
+'background file and sample file should share the same name except the last word, h2o or name of the sample'   
 'The Star research group @PITT reserves all the rights'
+
