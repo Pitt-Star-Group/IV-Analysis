@@ -1,31 +1,31 @@
 %Type out file directory
 
-Directory = 'C:\Users\Sean\Box Sync\Graduate School\Research\Data\Sensor\Source Meter\THC Sensor\2018-01-10 - IVds anti-THC 1 - THC in water titration';
+Directory = 'C:\Users\seani\Box Sync\Graduate School\Research\Data\Sensor\Source Meter\Au Clusters\2018-06-13 - Au Clusters Nanopure FET';
 cd(Directory);
 
 %Fill out information below.
 
-Material = 'Iso-sol + pyrene-COOH + THC antibody';
-Gating_Solvent = 'nanopure';
-Analyte = 'THC';
-Chip_ID = 'IVds anti-THC 1';
+Material = '171(-1)-H';
+Gating_Solvent = 'nanopure water';
+Analyte = 'none';
+Chip_ID = 'Au Clusters 171-(-1)-H';
 Data_Points = 201;
 
 %Include any additional experimental details.
 
-Experiment_Details = 'THC in nanopure; Liquid gated';
+Experiment_Details = 'Liquid gating measurements in water, 3x measurements';
 
 %List out the treatment order separated by comma.
 
 Treatment_Order = {
-    '1 50 nanopure',
-    '2 50 + 5 nanopure',
-    '3 50 + 2x5 nanopure',
-    '4 50 + 3x5 nanopure',
-    '5 50 + 3x5 nanopure + 1x5 2.8 mig/mL THC',
-    '6 50 + 3x5 nanopure + 2x5 2.8 mig/mL THC',
+    '1 nanopure',
+%    '2 nanopure',
+%    '3 nanopure'
+%    '4 50 + 3x5 nanopure',
+%    '5 50 + 3x5 nanopure + 1x5 2.8 mig/mL THC',
+%    '6 50 + 3x5 nanopure + 2x5 2.8 mig/mL THC',
 %    '7 50 + 3x5 nanopure + 3x5 2.8 mig/mL THC',
-    '8 50 nanopure'
+%    '8 50 nanopure'
 %    '6 Day 2 Blank water 3'
 %    '7 Day 3 280 pg/mL',
 %    '8 Day 4 Blank water 1',
@@ -52,15 +52,15 @@ Measurement_Count = 3;
 
 %Input functioning devices to analyze.
 
-Working_Devices = ['D'];
+Working_Devices = ['ABCD'];
 Working_Devices_Count = length(Working_Devices);
 
 %Set your file name prefixes separated by devices.
 
-Device_A_File_Names = dir([Chip_ID, ' - Dev A - IVg*']);
-Device_B_File_Names = dir([Chip_ID, ' - Dev B - IVg*']);
-Device_C_File_Names = dir([Chip_ID, ' - Dev C - IVg*']);
-Device_D_File_Names = dir([Chip_ID, ' - Dev D - IVg*']);
+Device_A_File_Names = dir([Chip_ID, ' - Dev A - LG IVg*']);
+Device_B_File_Names = dir([Chip_ID, ' - Dev B - LG IVg*']);
+Device_C_File_Names = dir([Chip_ID, ' - Dev C - LG IVg*']);
+Device_D_File_Names = dir([Chip_ID, ' - Dev D - LG IVg*']);
 
 Combined_File_Names = struct([]);
 
@@ -139,7 +139,10 @@ for count1 = 1:Working_Devices_Count
         for count2 = 1:Measurement_Count
             
             fprintf(fileID, '%s\t', Combined_File_Names(count3, count1).name);
-            fprintf(fileID, '%s\t', Treatment_Order{count3});
+            
+            Measurement_Write = compose([Treatment_Order{count3}, ' %d'], count2);
+            
+            fprintf(fileID, '%s\t', Measurement_Write{1});
             fprintf(fileID, '%e\t', count2);
         
         end
